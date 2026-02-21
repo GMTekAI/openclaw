@@ -122,9 +122,11 @@ app.get('/health', (req, res) => {
     res.json({ status: 'healthy', timestamp: new Date().toISOString() });
 });
 
-app.listen(port, () => {
+app.listen(port, '0.0.0.0', () => {
     console.log(`🤠 Shopify Smart Restock Bot running on port ${port}`);
     console.log('💰 Ready to generate revenue through intelligent inventory management!');
+    console.log(`🌐 Environment: ${process.env.NODE_ENV || 'development'}`);
+    console.log(`📍 Access: http://localhost:${port}`);
 });
 
 module.exports = app;
