@@ -38,6 +38,21 @@ const child = spawn(command, args, {
   shell: process.platform === "win32",
 });
 
+const SIGNAL_EXIT_CODES = {
+  SIGHUP: 1,
+  SIGINT: 2,
+  SIGKILL: 9,
+  SIGTERM: 15,
+};
+
+child.on("error", (error) => {
+  console.error(`with-env: failed to start "${command}": ${error.message}`);
+  process.exit(1);
+});
+
 child.on("exit", (code, signal) => {
-  process.exit(signal ? 1 : (code ?? 1));
+  if (signal) {
+    process.exit(128 + (SIGNAL_EXIT_CODES[signal] ?? 1));
+  }
+  process.exit(code ?? 1);
 });
