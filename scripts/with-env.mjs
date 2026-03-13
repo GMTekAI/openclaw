@@ -1,5 +1,6 @@
 #!/usr/bin/env node
 import { spawn } from "node:child_process";
+import { constants as osConstants } from "node:os";
 import process from "node:process";
 
 const usage = () => {
@@ -38,13 +39,6 @@ const child = spawn(command, args, {
   shell: process.platform === "win32",
 });
 
-const SIGNAL_EXIT_CODES = {
-  SIGHUP: 1,
-  SIGINT: 2,
-  SIGKILL: 9,
-  SIGTERM: 15,
-};
-
 child.on("error", (error) => {
   console.error(`with-env: failed to start "${command}": ${error.message}`);
   process.exit(1);
@@ -52,7 +46,7 @@ child.on("error", (error) => {
 
 child.on("exit", (code, signal) => {
   if (signal) {
-    process.exit(128 + (SIGNAL_EXIT_CODES[signal] ?? 1));
+    process.exit(128 + (osConstants.signals?.[signal] ?? 1));
   }
   process.exit(code ?? 1);
 });
