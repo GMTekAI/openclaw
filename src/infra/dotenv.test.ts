@@ -74,6 +74,13 @@ const WINDOWS_SHELL_TRUST_ROOT_ENV_KEYS = [
   "WINDIR",
 ] as const;
 
+const WORKSPACE_PATH_OVERRIDE_ENV_KEYS = [
+  "OPENCLAW_AGENT_DIR",
+  "OPENCLAW_BUNDLED_PLUGINS_DIR",
+  "OPENCLAW_OAUTH_DIR",
+  "PI_CODING_AGENT_DIR",
+] as const;
+
 async function writeEnvFile(filePath: string, contents: string) {
   await fs.mkdir(path.dirname(filePath), { recursive: true });
   await fs.writeFile(filePath, contents, "utf8");
@@ -449,17 +456,11 @@ describe("loadDotEnv", () => {
           ].join("\n"),
         );
 
-        deleteTestEnvValue("OPENCLAW_AGENT_DIR");
-        delete process.env.OPENCLAW_BUNDLED_PLUGINS_DIR;
-        delete process.env.OPENCLAW_OAUTH_DIR;
-        delete process.env.PI_CODING_AGENT_DIR;
+        clearEnv(WORKSPACE_PATH_OVERRIDE_ENV_KEYS);
 
         loadWorkspaceDotEnvFile(path.join(cwdDir, ".env"), { quiet: true });
 
-        expect(process.env.OPENCLAW_AGENT_DIR).toBeUndefined();
-        expect(process.env.OPENCLAW_BUNDLED_PLUGINS_DIR).toBeUndefined();
-        expect(process.env.OPENCLAW_OAUTH_DIR).toBeUndefined();
-        expect(process.env.PI_CODING_AGENT_DIR).toBeUndefined();
+        expectEnvUndefined(WORKSPACE_PATH_OVERRIDE_ENV_KEYS);
       });
     });
   });
